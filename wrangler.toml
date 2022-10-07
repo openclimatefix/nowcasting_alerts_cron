@@ -1,0 +1,6 @@
+name = "nowcasting_alerts_cron"
+main = "src/index.js"
+compatibility_date = "2022-10-07"
+
+[triggers]
+crons = [ "*/5 * * * *" ]
