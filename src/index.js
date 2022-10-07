@@ -1,7 +1,6 @@
 async function alerts(env, context) {
   const alertsKeys = await env.ALERTS.list()
-  // const alerts = await Promise.all(alertsKeys.keys.map(k => context.ALERTS.get(k.name, {type: "json"})))
-  const alerts = [{url: "https://webhook.site/ed77dbe0-e164-4e96-badf-473aa5c9bfba"}]
+  const alerts = await Promise.all(alertsKeys.keys.map(k => context.ALERTS.get(k.name, {type: "json"})))
 
   const ocf_req = await fetch("https://api.nowcasting.io/v0/solar/GB/national/forecast", { headers: { 'content-type': 'application/json;charset=UTF-8' }})
   const ocf_data = await ocf_req.json()
