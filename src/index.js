@@ -1,8 +1,8 @@
 async function alerts(env, context) {
   const alertsKeys = await env.ALERTS.list()
-  const alerts = await Promise.all(alertsKeys.keys.map(k => context.ALERTS.get(k.name, {type: "json"})))
+  const alerts = await Promise.all(alertsKeys.keys.map(k => env.ALERTS.get(k.name, {type: "json"})))
 
-  const ocf_req = await fetch("https://api.nowcasting.io/v0/solar/GB/national/forecast", { headers: { 'content-type': 'application/json;charset=UTF-8' }})
+  const ocf_req = await fetch("https://api.nowcasting.io/v0/solar/GB/national/forecast?historic=true", { headers: { 'content-type': 'application/json;charset=UTF-8' }})
   const ocf_data = await ocf_req.json()
   const pvlive_req = await fetch("https://api.nowcasting.io/v0/solar/GB/national/pvlive?regime=in-day", { headers: { 'content-type': 'application/json;charset=UTF-8' }})
   const pvlive_data = await pvlive_req.json()
