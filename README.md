@@ -18,4 +18,4 @@ Deployment is currently manually done by running `wrangler publish --name nowcas
 
 Data for this app is stored using Cloudflare key-value storage
 (when setting up the main repo you will have already done: Create KV namespaces: nowcasting-alerts-ALERTS, nowcasting-alerts-LOG)
-Goto main nav Workers > KV > nowcasting_alerts_cron > Settings > Variables > KV namespace bindings. Add bindings: ALERTS = nowcasting-alerts-ALERTS, LOG = nowcasting-alerts-LOG
+Goto main nav Workers > KV and copy the IDs for nowcasting-alerts-ALERTS, nowcasting-alerts-LOG then paste them into the kv_namespaces in wrangler.toml
