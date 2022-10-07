@@ -4,7 +4,7 @@ The main nowcasting_alerts repo details the Remix application for managing alert
 
 ## Running locally
 
-Run `wrangler dev --local` in your terminal to start a development server
+Run `npm run start` in your terminal to start a development server
 Run `curl "http://localhost:8787/cdn-cgi/mf/scheduled"` to trigger the scheduled event
 Go back to the console to see what your worker has logged
 Update the Cron trigger in wrangler.toml (see https://developers.cloudflare.com/workers/gler/configuration/#triggers)

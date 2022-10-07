@@ -6,7 +6,7 @@
   },
   "private": true,
   "scripts": {
-    "start": "wrangler dev",
+    "start": "npx miniflare src/index.js --modules --live-reload --kv ALERTS --kv LOG",
     "deploy": "wrangler publish"
   }
 }
