@@ -7,8 +7,8 @@ async function alerts(env) {
   const pvlive_req = await fetch("https://api.nowcasting.io/v0/solar/GB/national/pvlive?regime=in-day", { headers: { 'content-type': 'application/json;charset=UTF-8' }})
   const pvlive_data = await pvlive_req.json()
 
-  // Hardcoded 0.5GW deviation check for now
-  const threshold_kw = 500000
+  // Hardcoded 1GW deviation check for now
+  const threshold_kw = 1000000
   // First value in pvlive_data array is the most recent PV_Live estimate (usually from the past 30min)
   const latest_pvlive_kw = pvlive_data[0]["solarGenerationKw"]
   // Now we find the corresponding OCF estimate
