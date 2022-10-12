@@ -1,0 +1,11 @@
+name = "nowcasting_alerts_cron"
+main = "src/index.js"
+compatibility_date = "2022-10-07"
+
+kv_namespaces = [ 
+{ binding = "ALERTS", id = "8289a7adda704dc59d6083cbc9572007" },
+{ binding = "LOG", id = "e8f6e884071d4638ae2a12e99cdd5c2a" }
+]
+
+[triggers]
+crons = [ "*/30 * * * *" ]

@@ -3,8 +3,8 @@ main = "src/index.js"
 compatibility_date = "2022-10-07"
 
 kv_namespaces = [ 
-{ binding = "ALERTS", id = "788897abc8e647498fbe6b8d98080bf7" },
-{ binding = "LOG", id = "4f8c59850d3b418ca008c43a997100fb" }
+{ binding = "ALERTS", id = "" },
+{ binding = "LOG", id = "" }
 ]
 
 [triggers]
