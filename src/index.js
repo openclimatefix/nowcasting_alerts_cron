@@ -1,4 +1,4 @@
-async function alerts(env, context) {
+async function alerts(env) {
   const alertsKeys = await env.ALERTS.list()
   const alerts = await Promise.all(alertsKeys.keys.map(k => env.ALERTS.get(k.name, {type: "json"})))
 
@@ -16,10 +16,13 @@ async function alerts(env, context) {
 
   if (latest_ocf_estimate) {
     const latest_ocf_kw = Math.round(latest_ocf_estimate.expectedPowerGenerationMegawatts * 1000)
-    const deviation = latest_ocf_kw - latest_pvlive_kw
+    const deviation = latest_pvlive_kw - latest_ocf_kw
     if (Math.abs(deviation) >= threshold_kw) {
       // Trigger all configured alerts
-      const alert_msg = `PV Alert! Deviation of ${deviation.toLocaleString()}kW is beyond 0.5GW threshold. OCF Nowcasting: ${latest_ocf_kw.toLocaleString()}kW vs PV_Live: ${latest_pvlive_kw.toLocaleString()}kW (using forecast values as of ${pvlive_data[0]["datetimeUtc"]}).`
+      const pv_live_above_below = deviation > 0 ? ":arrow_up: above" : ":arrow_down: below"
+      const alert_msg = `PVLive Alert! PV Live is ${Math.abs(deviation).toLocaleString()}kW {pv_live_above_below} OCF Forecast for ${pvlive_data[0]["datetimeUtc"]}.
+OCF Nowcast ${latest_ocf_kw.toLocaleString()}kW vs PV Live ${latest_pvlive_kw.toLocaleString()}kW.
+Deviation above threshold of 500MW.`
       console.log(alert_msg)
       env.LOG.put(crypto.randomUUID(), JSON.stringify({
         text: alert_msg
@@ -48,6 +51,6 @@ async function alerts(env, context) {
 
 export default {
 	async scheduled(controller, env, context) {
-    context.waitUntil(alerts(env, context))
+    context.waitUntil(alerts(env))
 	},
 };
