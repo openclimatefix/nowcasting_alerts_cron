@@ -1,0 +1,11 @@
+name = "nowcasting_alerts_daily_max_cron"
+main = "index.js"
+compatibility_date = "2022-10-07"
+
+kv_namespaces = [ 
+{ binding = "ALERTS", id = "" },
+{ binding = "LOG", id = "" }
+]
+
+[triggers]
+crons = [ "0 7 * * *" ]

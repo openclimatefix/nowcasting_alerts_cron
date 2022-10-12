@@ -12,6 +12,7 @@
     "url": "git+https://github.com/openclimatefix/nowcasting_alerts_cron.git"
   },
   "workspaces": [
-    "deviation"
+    "deviation",
+    "daily_max"
   ]
 }

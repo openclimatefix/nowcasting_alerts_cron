@@ -1,0 +1,15 @@
+{
+  "name": "daily_max",
+  "version": "0.0.1",
+  "description": "Finds the daily max OCF forcast.",
+  "main": "index.js",
+  "devDependencies": {},
+  "scripts": {
+    "dev": "npx miniflare index.js --modules --live-reload --kv ALERTS --kv LOG",
+    "deploy": "wrangler publish"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/openclimatefix/nowcasting_alerts_cron.git"
+  }
+}
