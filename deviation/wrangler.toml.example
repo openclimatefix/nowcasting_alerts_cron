@@ -1,5 +1,5 @@
-name = "nowcasting_alerts_cron"
-main = "src/index.js"
+name = "nowcasting_alerts_deviation_cron"
+main = "index.js"
 compatibility_date = "2022-10-07"
 
 kv_namespaces = [ 
