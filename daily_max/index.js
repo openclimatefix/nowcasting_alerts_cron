@@ -7,9 +7,10 @@ async function daily_max(env) {
 
   const [todays_date] = new Date().toISOString().split('T')
   const todays_forecast_values = ocf_data["forecastValues"].filter(o => o.targetTime.split('T')[0] === todays_date)
+  console.log(todays_forecast_values)
   let max_forecast_value = todays_forecast_values[0]
   for (const fv of todays_forecast_values) {
-    if (fv > max_forecast_value.expectedPowerGenerationMegawatts) {
+    if (fv.expectedPowerGenerationMegawatts > max_forecast_value.expectedPowerGenerationMegawatts) {
       max_forecast_value = fv
     }
   }
