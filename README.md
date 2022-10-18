@@ -50,10 +50,10 @@ Goto Cloudflare dashboard main nav Workers > KV and copy the IDs for nowcasting-
 npm run publish --workspaces
 ```
 
-Or publish an individual Worker:
+Or deploy to production an individual Worker:
 
 ```
-npm run publish --workspace=[Cloudflare Worker name]
+npm run deploy --workspace=[Cloudflare Worker name]
 ```
 
 # Limitations

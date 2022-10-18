@@ -8,21 +8,21 @@ async function alerts(env) {
   const pvlive_data = await pvlive_req.json()
 
   // Hardcoded 1GW deviation check for now
-  const threshold_kw = 1000000
+  const threshold_mw = 1000
   // First value in pvlive_data array is the most recent PV_Live estimate (usually from the past 30min)
-  const latest_pvlive_kw = pvlive_data[0]["solarGenerationKw"]
+  const latest_pvlive_mw = Math.round(pvlive_data[0]["solarGenerationKw"] / 1000)
   // Now we find the corresponding OCF estimate
   const latest_ocf_estimate = ocf_data["forecastValues"].find(o => o.targetTime === pvlive_data[0]["datetimeUtc"])
 
   if (latest_ocf_estimate) {
-    const latest_ocf_kw = Math.round(latest_ocf_estimate.expectedPowerGenerationMegawatts * 1000)
-    const deviation = latest_pvlive_kw - latest_ocf_kw
-    if (Math.abs(deviation) >= threshold_kw) {
+    const latest_ocf_mw = Math.round(latest_ocf_estimate.expectedPowerGenerationMegawatts)
+    const deviation = latest_pvlive_mw - latest_ocf_mw
+    if (Math.abs(deviation) >= threshold_mw) {
       // Trigger all configured alerts
       const pv_live_above_below = deviation > 0 ? ":arrow_up: above" : ":arrow_down: below"
-      const alert_msg = `PVLive Alert! PV Live is ${Math.abs(deviation).toLocaleString()}kW {pv_live_above_below} OCF Forecast for ${pvlive_data[0]["datetimeUtc"]}.
-OCF Nowcast ${latest_ocf_kw.toLocaleString()}kW vs PV Live ${latest_pvlive_kw.toLocaleString()}kW.
-Deviation above threshold of 500MW.`
+      const alert_msg = `PVLive Alert! PV Live is ${Math.abs(deviation).toLocaleString()}MW ${pv_live_above_below} OCF Forecast for ${pvlive_data[0]["datetimeUtc"]}.
+OCF Nowcast ${latest_ocf_mw.toLocaleString()}MW vs PV Live ${latest_pvlive_mw.toLocaleString()}MW.
+Deviation exceeds threshold of 1,000MW.`
       console.log(alert_msg)
       env.LOG.put(crypto.randomUUID(), JSON.stringify({
         text: alert_msg
