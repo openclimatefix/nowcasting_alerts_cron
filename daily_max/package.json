@@ -5,7 +5,7 @@
   "main": "index.js",
   "devDependencies": {},
   "scripts": {
-    "dev": "npx miniflare index.js --modules --live-reload --kv ALERTS --kv LOG",
+    "dev": "npx miniflare index.js --env .env.local --modules --live-reload --kv ALERTS --kv LOG",
     "deploy": "wrangler publish"
   },
   "repository": {

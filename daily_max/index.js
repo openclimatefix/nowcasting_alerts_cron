@@ -2,7 +2,24 @@ async function daily_max(env) {
   const alertsKeys = await env.ALERTS.list()
   const alerts = await Promise.all(alertsKeys.keys.map(k => env.ALERTS.get(k.name, {type: "json"})))
 
-  const ocf_req = await fetch("https://api.nowcasting.io/v0/solar/GB/national/forecast?historic=true", { headers: { 'content-type': 'application/json;charset=UTF-8' }})
+  const response = await fetch('https://nowcasting-pro.eu.auth0.com/oauth/token', {
+    method: 'POST',
+    headers: {
+      'content-type': 'application/json'
+    },
+    body: JSON.stringify({
+      client_id: env.CLIENT_ID,
+      client_secret:env.CLIENT_SECRET,
+      audience:"https://api.nowcasting.io/",
+      grant_type:"client_credentials"
+    })
+  })
+  const result = await response.json();
+  const token = result?.access_token;
+
+  if(!token) return;
+
+  const ocf_req = await fetch("https://api.nowcasting.io/v0/solar/GB/national/forecast?historic=true", { headers: { 'content-type': 'application/json;charset=UTF-8', 'authorization': `Bearer ${token}` }})
   const ocf_data = await ocf_req.json()
 
   const [todays_date] = new Date().toISOString().split('T')
@@ -17,7 +34,7 @@ async function daily_max(env) {
 
   const alert_msg = `PV Today Max Alert! OCF Nowcast maximum of ${Math.round(max_forecast_value.expectedPowerGenerationMegawatts).toLocaleString()} MW today, peaking ${new Date(max_forecast_value.targetTime).toLocaleTimeString('en-GB', { timeStyle: 'long' })} ${new Date(max_forecast_value.targetTime).toLocaleDateString('en-GB', { dateStyle: 'long' })}.`
   console.log(alert_msg)
-  
+
   env.LOG.put(crypto.randomUUID(), JSON.stringify({
     text: alert_msg
   }), {
