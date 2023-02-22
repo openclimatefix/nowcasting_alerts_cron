@@ -32,8 +32,47 @@ async function daily_max(env) {
     }
   }
 
-  const alert_msg = `PV Today Max Alert! OCF Nowcast maximum of ${Math.round(max_forecast_value.expectedPowerGenerationMegawatts).toLocaleString()} MW today, peaking ${new Date(max_forecast_value.targetTime).toLocaleTimeString('en-GB', { timeStyle: 'long' })} ${new Date(max_forecast_value.targetTime).toLocaleDateString('en-GB', { dateStyle: 'long' })}.`
-  console.log(alert_msg)
+  const time = new Date(max_forecast_value.targetTime).toLocaleTimeString('en-GB', { timeStyle: 'long' });
+  const date = new Date(max_forecast_value.targetTime).toLocaleDateString('en-GB', { dateStyle: 'long' });
+  const maxMegawatts = Math.round(max_forecast_value.expectedPowerGenerationMegawatts).toLocaleString();
+
+  const alert_msg = `PV Today Max Alert! OCF Nowcast maximum of ${maxMegawatts} MW today, peaking ${time} ${date}.`
+  const alertMsgBlocks = [
+      {
+        type: "section",
+        text: {
+          type: "mrkdwn",
+          text: `>*PV Today Max Alert* \n>:chart_with_upwards_trend: OCF Nowcast Maximum of *${maxMegawatts} MW* today.`
+        }
+      },
+      {
+        type: "section",
+        text: {
+          type: "mrkdwn",
+          text: `\`\`\`Peaking at ${time} \n${date}\`\`\``
+        },
+        accessory: {
+          type: "button",
+          text: {
+            type: "plain_text",
+            text: "View Forecast  :sunny:",
+            emoji: true
+          },
+          value: "click_me_123",
+          url: "https://app.nowcasting.io",
+          action_id: "button-action"
+        }
+      },
+      {
+        type: "context",
+        elements: [
+          {
+            type: "mrkdwn",
+            text: "Alert trigger: Daily max forecast alert"
+          }
+        ]
+      }
+    ];
 
   env.LOG.put(crypto.randomUUID(), JSON.stringify({
     text: alert_msg
@@ -43,7 +82,8 @@ async function daily_max(env) {
   const init = {
     // Hard coded Slack webhook format for now
     body: JSON.stringify({
-      text: alert_msg
+      text: alert_msg,
+      blocks: alertMsgBlocks
     }),
     method: 'POST',
     headers: {
@@ -52,7 +92,7 @@ async function daily_max(env) {
   }
   for (const alert of alerts) {
     const response = await fetch(alert.url, init);
-    console.log(`Alert webhook POST to ${alert.url} responsed with ${response.status}`)
+    console.log(`Alert webhook POST to ${alert.url} responded with ${response.status}`)
   }
 }
 
