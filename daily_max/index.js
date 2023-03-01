@@ -74,7 +74,7 @@ async function daily_max(env) {
       }
     ];
 
-  env.LOG.put(crypto.randomUUID(), JSON.stringify({
+  env.LOG.put(`${new Date().toISOString()}--${crypto.randomUUID()}`, JSON.stringify({
     text: alert_msg
   }), {
     metadata: { loggedAt: new Date().toISOString() },

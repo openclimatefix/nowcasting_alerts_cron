@@ -2,10 +2,12 @@ name = "nowcasting_alerts_deviation_cron"
 main = "index.js"
 compatibility_date = "2022-10-07"
 
-kv_namespaces = [ 
+kv_namespaces = [
 { binding = "ALERTS", id = "" },
 { binding = "LOG", id = "" }
 ]
 
 [triggers]
 crons = [ "*/30 * * * *" ]
+
+[vars]

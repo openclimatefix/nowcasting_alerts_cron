@@ -1,10 +1,26 @@
 async function alerts(env) {
   const alertsKeys = await env.ALERTS.list()
   const alerts = await Promise.all(alertsKeys.keys.map(k => env.ALERTS.get(k.name, {type: "json"})))
+  const response = await fetch('https://nowcasting-pro.eu.auth0.com/oauth/token', {
+    method: 'POST',
+    headers: {
+      'content-type': 'application/json'
+    },
+    body: JSON.stringify({
+      client_id: env.CLIENT_ID,
+      client_secret:env.CLIENT_SECRET,
+      audience:"https://api.nowcasting.io/",
+      grant_type:"client_credentials"
+    })
+  })
+  const result = await response.json();
+  const token = result?.access_token;
 
-  const ocf_req = await fetch("https://api.nowcasting.io/v0/solar/GB/national/forecast?historic=true", { headers: { 'content-type': 'application/json;charset=UTF-8' }})
+  if(!token) return;
+
+  const ocf_req = await fetch("https://api.nowcasting.io/v0/solar/GB/national/forecast?historic=true", { headers: { 'content-type': 'application/json;charset=UTF-8', 'authorization': `Bearer ${token}` }})
   const ocf_data = await ocf_req.json()
-  const pvlive_req = await fetch("https://api.nowcasting.io/v0/solar/GB/national/pvlive?regime=in-day", { headers: { 'content-type': 'application/json;charset=UTF-8' }})
+  const pvlive_req = await fetch("https://api.nowcasting.io/v0/solar/GB/national/pvlive?regime=in-day", { headers: { 'content-type': 'application/json;charset=UTF-8', 'authorization': `Bearer ${token}` }})
   const pvlive_data = await pvlive_req.json()
 
   // Hardcoded 1GW deviation check for now
@@ -19,12 +35,53 @@ async function alerts(env) {
     const deviation = latest_pvlive_mw - latest_ocf_mw
     if (Math.abs(deviation) >= threshold_mw) {
       // Trigger all configured alerts
-      const pv_live_above_below = deviation > 0 ? ":arrow_up: above" : ":arrow_down: below"
-      const alert_msg = `PVLive Alert! PV Live is ${Math.abs(deviation).toLocaleString()}MW ${pv_live_above_below} OCF Forecast for ${pvlive_data[0]["datetimeUtc"]}.
-OCF Nowcast ${latest_ocf_mw.toLocaleString()}MW vs PV Live ${latest_pvlive_mw.toLocaleString()}MW.
-Deviation exceeds threshold of 1,000MW.`
+      const pv_live_above_below = deviation > 0 ? ":arrow_up_small: above" : ":arrow_down_small: below"
+      const formattedDeviationString = Math.abs(deviation).toLocaleString()
+      const formattedDatetime = new Date(pvlive_data[0]["datetimeUtc"]).toLocaleString()
+      const formattedLatestOcfMw = latest_ocf_mw.toLocaleString()
+      const formattedLatestPvliveMw = latest_pvlive_mw.toLocaleString()
+      const alert_msg = `PVLive Alert! PV Live is ${formattedDeviationString}MW ${pv_live_above_below} OCF Forecast for ${formattedDatetime}.
+OCF Nowcast ${formattedLatestOcfMw}MW vs PV Live ${formattedLatestPvliveMw}MW.
+Deviation exceeds threshold of ${threshold_mw}MW.`
       console.log(alert_msg)
-      env.LOG.put(crypto.randomUUID(), JSON.stringify({
+      const alertBlocks = [
+        {
+          type: "section",
+          text: {
+            type: "mrkdwn",
+            text: `>*Intra-day PV Live Alert* \n :red_circle: *${formattedDeviationString} MW* ${pv_live_above_below} OCF Forecast \nfor ${formattedDatetime}`
+          }
+        },
+        {
+          type: "section",
+          text: {
+            type: "mrkdwn",
+            text: `\`\`\`OCF Nowcast   ${formattedLatestOcfMw} MW \nPV Live       ${formattedLatestPvliveMw} MW\`\`\``
+          },
+          accessory: {
+            type: "button",
+            text: {
+              type: "plain_text",
+              text: "View Forecast  :sunny:",
+              emoji: true
+            },
+            value: "click_me_123",
+            url: "https://app.nowcasting.io",
+            action_id: "button-action"
+          }
+        },
+        {
+          type: "context",
+          elements: [
+            {
+              type: "mrkdwn",
+              text: `Alert trigger:  Deviation to Intra-day PV Live exceeded ${threshold_mw} MW threshold.`
+            }
+          ]
+        }
+      ]
+      console.log(JSON.stringify(alertBlocks))
+      env.LOG.put(`${new Date().toISOString()}--${crypto.randomUUID()}`, JSON.stringify({
         text: alert_msg
       }), {
         metadata: { loggedAt: new Date().toISOString() },
@@ -32,7 +89,8 @@ Deviation exceeds threshold of 1,000MW.`
       const init = {
         // Hard coded Slack webhook format for now
         body: JSON.stringify({
-          text: alert_msg
+          text: alert_msg,
+          blocks: alertBlocks
         }),
         method: 'POST',
         headers: {
@@ -41,7 +99,7 @@ Deviation exceeds threshold of 1,000MW.`
       }
       for (const alert of alerts) {
         const response = await fetch(alert.url, init);
-        console.log(`Alert webhook POST to ${alert.url} responsed with ${response.status}`)
+        console.log(`Alert webhook POST to ${alert.url} responded with ${response.status}`)
       }
     }
   } else {
