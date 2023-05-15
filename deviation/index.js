@@ -36,7 +36,7 @@ async function alerts(env) {
       // Trigger all configured alerts
       const pv_live_above_below = deviation > 0 ? ":arrow_up_small: above" : ":arrow_down_small: below"
       const formattedDeviationString = Math.abs(deviation).toLocaleString()
-      const formattedDatetime = new Date(pvlive_data[0]["datetimeUtc"]).toLocaleString()
+      const formattedDatetime = new Date(pvlive_data[0]["datetimeUtc"]).toLocaleDateString("en-GB", { timeZone: "Europe/London" });
       const formattedLatestOcfMw = latest_ocf_mw.toLocaleString()
       const formattedLatestPvliveMw = latest_pvlive_mw.toLocaleString()
       const alert_msg = `PVLive Alert! PV Live is ${formattedDeviationString}MW ${pv_live_above_below} OCF Forecast for ${formattedDatetime}.
