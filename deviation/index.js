@@ -18,7 +18,7 @@ async function alerts(env) {
 
   if(!token) return;
 
-  const ocf_req = await fetch("https://api.nowcasting.io/v0/solar/GB/national/forecast?historic=true", { headers: { 'content-type': 'application/json;charset=UTF-8', 'authorization': `Bearer ${token}` }})
+  const ocf_req = await fetch("https://api.nowcasting.io/v0/solar/GB/national/forecast?historic=true&only_forecast_values=true", { headers: { 'content-type': 'application/json;charset=UTF-8', 'authorization': `Bearer ${token}` }})
   const ocf_data = await ocf_req.json()
   const pvlive_req = await fetch("https://api.nowcasting.io/v0/solar/GB/national/pvlive?regime=in-day", { headers: { 'content-type': 'application/json;charset=UTF-8', 'authorization': `Bearer ${token}` }})
   const pvlive_data = await pvlive_req.json()
@@ -28,8 +28,7 @@ async function alerts(env) {
   // First value in pvlive_data array is the most recent PV_Live estimate (usually from the past 30min)
   const latest_pvlive_mw = Math.round(pvlive_data[0]["solarGenerationKw"] / 1000)
   // Now we find the corresponding OCF estimate
-  const latest_ocf_estimate = ocf_data["forecastValues"].find(o => o.targetTime === pvlive_data[0]["datetimeUtc"])
-
+  const latest_ocf_estimate = ocf_data.find(o => o.targetTime === pvlive_data[0]["datetimeUtc"])
   if (latest_ocf_estimate) {
     const latest_ocf_mw = Math.round(latest_ocf_estimate.expectedPowerGenerationMegawatts)
     const deviation = latest_pvlive_mw - latest_ocf_mw
