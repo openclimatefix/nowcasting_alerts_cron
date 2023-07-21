@@ -2,10 +2,10 @@
   "name": "daily_max",
   "version": "0.0.1",
   "description": "Finds the daily max OCF forcast.",
-  "main": "index.js",
+  "main": "index.ts",
   "devDependencies": {},
   "scripts": {
-    "dev": "npx miniflare index.js --env .env.local --modules --live-reload --kv ALERTS --kv LOG",
+    "dev": "npx miniflare index.ts --env .env.local --modules --live-reload --kv ALERTS --kv LOG",
     "deploy": "wrangler publish"
   },
   "repository": {

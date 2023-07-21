@@ -2,10 +2,10 @@
   "name": "deviation",
   "version": "0.0.1",
   "description": "Checks for deivation between OCF and PV_Live forecasts.",
-  "main": "index.js",
+  "main": "index.ts",
   "devDependencies": {},
   "scripts": {
-    "dev": "npx miniflare index.js --env .env.local --modules --live-reload --kv ALERTS --kv LOG",
+    "dev": "npx miniflare index.ts --env .env.local --modules --live-reload --kv ALERTS --kv LOG",
     "deploy": "wrangler publish"
   },
   "repository": {

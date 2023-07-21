@@ -73,6 +73,7 @@ If you add a new worker, ensure you create a preview KV namespace for both `ALER
 ```bash
 npx wrangler kv:namespace create "LOG" --preview
 npx wrangler kv:namespace create "ALERTS" --preview
+npx wrangler kv:namespace create "STORAGE" --preview
 ```
 and add the IDs to the `wrangler.toml` file for the new worker under "preview_id".
 You can find these in the Cloudflare dashboard main nav Workers > KV, or manage from the CLI:
